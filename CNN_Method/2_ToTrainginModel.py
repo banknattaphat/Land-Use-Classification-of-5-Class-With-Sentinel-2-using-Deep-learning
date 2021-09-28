@@ -9,3 +9,8 @@ def train_test_spilt(Features, Labels, trainProp=0.6):
     Y_train = Labels[randindex[:sliceindex]]
     Y_test = Labels[randindex[sliceindex:]]
     return (X_train, X_test, Y_train, Y_test)
+
+#Spilt the data
+X_train, X_test, Y_train, Y_test = train_test_spilt(Features_PKT, Labels_PKT)
+print(f'Feature shape:\nX train: {X_train.shape} | X test: {X_test.shape}')
+print(f'Lable shape:\nY train: {Y_train.shape} | Y test: {Y_test.shape}')
