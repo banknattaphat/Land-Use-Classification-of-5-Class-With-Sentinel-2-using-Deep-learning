@@ -1,3 +1,8 @@
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Dropout, Flatten
+from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score
+
 #Define the function split data
 def train_test_spilt(Features, Labels, trainProp=0.6):
     datasize = Features.shape[0]
