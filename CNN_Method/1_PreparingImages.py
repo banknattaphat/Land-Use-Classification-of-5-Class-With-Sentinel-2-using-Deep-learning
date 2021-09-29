@@ -3,7 +3,7 @@ random.seed(2)
 import numpy as np
 import pyrsgis.raster as raster
 
-Img_Dir = r"D:\Project\CNN Of Project\CNN\ImageChips_128by128"
+Img_Dir = r"D:\Project\LU_DL_Project\CNN\ImageChips_25by25"
 os.chdir(Img_Dir)
 
 #Get the number of file (Count images)
@@ -26,7 +26,7 @@ for n, file in enumerate(glob.glob('*.tif')):
     Features_PKT[n, :, :, :] = tempArr
     Labels_PKT[n] = tempLabel
     
-    if n % 6000 == 0:
+    if n % 39739 == 0:
         print('Sample read: %d 0f %d' % (n,nSample))
 
 print(f'Feature Shape: {Features_PKT.shape}\nLabels Shape: {Labels_PKT.shape}')
@@ -35,32 +35,24 @@ print(f'Feature Value: Min {Features_PKT.min()} | Max {Features_PKT.max()}\nLabe
 """ if you need to convert feature & label data as array file. Now, TODO below this code """
 """ Before to Downsample & Separate data for feature & label dada """
 
-#Setting output directory to Save array file
-Output_dir = r"D:\Project\CNN Of Project\CNN\Output"
-os.chdir(Output_dir)
-
-np.save('CNN_Features_128by128_PKT.npy', Features_PKT)
-np.save('CNN_labels_128by128_PKT.npy', Labels_PKT)
-print('Finished save file here >> %s' % (os.getcwd()))
-""" ================================================================ """
 
 """ TODO Downsample & Separate data for feature & label dada """
 #Separate & Balance for 5 class % No Value
 #Built up / Urban
-Features_U = Feature_PKT[Label_PKT==1]
-Labels_U = Label_PKT[Label_PKT==1]
+Features_U = Features_PKT[Labels_PKT==1]
+Labels_U = Labels_PKT[Labels_PKT==1]
 #Agriculture / Farm
-Features_A = Feature_PKT[Label_PKT==2]
-Labels_A = Label_PKT[Label_PKT==2]
+Features_A = Features_PKT[Labels_PKT==2]
+Labels_A = Labels_PKT[Labels_PKT==2]
 #Green Area / Forest
-Features_F = Feature_PKT[Label_PKT==3]
-Labels_F = Label_PKT[Label_PKT==3]
+Features_F = Features_PKT[Labels_PKT==3]
+Labels_F = Labels_PKT[Labels_PKT==3]
 #Water Area / Lake_River
-Features_W = Feature_PKT[Label_PKT==4]
-Labels_W = Label_PKT[Label_PKT==4]
+Features_W = Features_PKT[Labels_PKT==4]
+Labels_W = Labels_PKT[Labels_PKT==4]
 #Miscelleaoues / Bare land
-Features_M = Feature_PKT[Label_PKT==5]
-Labels_M = Label_PKT[Label_PKT==5]
+Features_M = Features_PKT[Labels_PKT==5]
+Labels_M = Labels_PKT[Labels_PKT==5]
 
 #No value % Ignore value
 No_Feature = Feature_PKT[Label_PKT==0]
@@ -97,10 +89,10 @@ Label_Promp = np.concatenate((Labels_U,Labels_A,Labels_F,Labels_W,Labels_M,No_La
 print(f'Feature shape: {Feature_Promp.shape} | Label shape: {Label_Promp.shape}')
 
 #Change to output folder to save array file
-Output_dir = r"D:\Project\CNN Of Project\CNN\Output"
+Output_dir = r"D:\Project\LU_DL_Project\CNN\Output\Images_Data_25x25"
 os.chdir(Output_dir)
 
 #Load faeture & label data promp
-np.save('CNN_Images_Features_128by128_PKT.npy', Feature_Promp)
-np.load('CNN_Images_Labels_128by128_PKT.npy', Label_Promp)
+np.save('CNN_Features_25x25_Ready_PKT.npy', Feature_Promp)
+np.load('CNN_Labels_25x25_Ready_PKT.npy', Label_Promp)
 print('Finished save file here >> %s' % (os.getcwd()))
