@@ -2,6 +2,7 @@ import os, time, math, glob, random
 random.seed(2)
 import numpy as np
 import pyrsgis.raster as raster
+from sklearn.utils import resample
 
 Img_Dir = r"D:\Project\LU_DL_Project\CNN\ImageChips_25by25"
 os.chdir(Img_Dir)
