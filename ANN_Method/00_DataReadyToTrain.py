@@ -73,3 +73,26 @@ model.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=
 
 # Run the model
 model.fit(xTrain, yTrain, batch_size=5, epochs=25, verbose=1, validation_data=(xTest, yTest))
+
+# Predict for test data 
+yTestPredicted = model.predict(xTest)
+yTestPredicted = np.argmax(yTestPredicted, axis=1)
+
+# Calculate and display the error metrics
+cMatrix = confusion_matrix(yTest, yTestPredicted)
+pScore = precision_score(yTest, yTestPredicted, average='micro')
+rScore = recall_score(yTest, yTestPredicted, average='micro')
+f1Score = f1_score(yTest, yTestPredicted, average='micro')
+
+print("Confusion matrix: for 18 nodes\n", cMatrix)
+print("\nP-Score: %.3f, R-Score: %.3f, F1-Score: %.3f" % (pScore, rScore, f1Score))
+
+#Normailzied to Predicted Feature
+Feature_nor = Feature_PKT / 255.0
+predicted = model.predict(Feature_nor)
+predicted = np.argmax(predicted, axis=1)
+
+# Predict new data and export the probability raster
+prediction = np.reshape(predicted, (ds3.RasterYSize, ds3.RasterXSize))
+outFile = 'Feature_PKT_Predict_09_02_2018.tif'
+raster.export(prediction, ds3, filename=outFile, dtype='float')
