@@ -10,20 +10,20 @@ from tensorflow import keras
 # Change the directory
 os.chdir(r"C:\Users\cdhsn\miniconda3\envs\env_dl\Project Classification\Data_image\Dataset\LU_To_Label")
 
+# Change the directory
+os.chdir(r"C:\Users\std\Desktop\Dataset_Project")
+
 # Assign file names
-Feature_PKT = "PKT_Extent_Clip_Inner_2018_09.tif"
-Label_PKT = "Label_PKT_Extent_090261.tif"
-Feature_Predic = "PKT_Extent_Clip_Inner_2018_01_11.tif"
+Feature_PKT = "Phuket_GEE_2018_4Band.tif"
+Label_PKT = "HKT_GEE_RF_2018_Sieve.tif"
 
 # Read the rasters as array
 ds1, Feature_PKT = raster.read(Feature_PKT, bands='all')
 ds2, Label_PKT = raster.read(Label_PKT, bands=1)
-ds3, Feature_Pre = raster.read(Feature_Predic, bands='all')
 
 # Print the size of the arrays
-print("Bangalore Multispectral image shape: ", Feature_PKT.shape)
-print("Bangalore Binary built-up image shape: ", Label_PKT.shape)
-print("Hyderabad Multispectral image shape: ", Feature_Pre.shape)
+print("Phuket Multispectral image shape: ", Feature_PKT.shape)
+print("Phuket Landuse image shape: ", Label_PKT.shape)
 
 # # Clean the labelled data to replace NoData values by zero
 # Label_PKT = (Label_PKT).astype(int)
@@ -31,18 +31,24 @@ print("Hyderabad Multispectral image shape: ", Feature_Pre.shape)
 # Reshape the array to single dimensional array
 Feature_PKT = changeDimension(Feature_PKT)
 Label_PKT = changeDimension (Label_PKT)
-Feature_Pre = changeDimension(Feature_Pre)
 nBands = Feature_PKT.shape[1]
+
+print("Phuket Multispectral New image shape: ", Feature_PKT.shape)
+print("Phuket Laduse New image shape: ", Label_PKT.shape)
 
 print("Bangalore Multispectral image shape: ", Feature_PKT.shape)
 print("Bangalore Binary built-up image shape: ", Label_PKT.shape)
 print("Hyderabad Multispectral image shape: ", Feature_Pre.shape)
 
 # Split testing and training datasets
-xTrain, xTest, yTrain, yTest = train_test_split(Feature_PKT, Label_PKT, test_size=0.4, random_state=42)
+X_Train, X_Test, Y_Train, Y_Test = train_test_split(Feature_PKT, Label_PKT, test_size=0.4, random_state=42)
 
-print(xTrain.shape,yTrain.shape)
-print(xTest.shape,yTest.shape)
+# Reshape the data
+xTrain = X_Train.reshape((X_Train.shape[0], 1, X_Train.shape[1]))
+xTest = X_Test.reshape((X_Test.shape[0], 1, X_Test.shape[1]))
+
+# Print the shape of reshaped data
+print(xTrain.shape, xTest.shape)
 
 # Normalise the data (Feature)
 xTrain = xTrain / 255.0
@@ -65,34 +71,37 @@ print(xTrain.shape, xTest.shape, Feature_Pre.shape)
 # Define the parameters of the model
 model = keras.Sequential([
     keras.layers.Flatten(input_shape=(1, nBands)),
-    keras.layers.Dense(18, activation='relu'),
-    keras.layers.Dense(5, activation='softmax')])
+    keras.layers.Dense(24, activation='relu'),
+    keras.layers.Dropout(0.25),
+    keras.layers.Dense(6, activation='softmax')])
 
 # Define the accuracy metrics and parameters
 model.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
 
 # Run the model
-model.fit(xTrain, yTrain, batch_size=5, epochs=25, verbose=1, validation_data=(xTest, yTest))
+model.fit(X_Train, Y_Train, batch_size=5, epochs=50, verbose=1, validation_data=(X_Test, Y_Test))
 
 # Predict for test data 
-yTestPredicted = model.predict(xTest)
+yTestPredicted = model.predict(X_Test)
 yTestPredicted = np.argmax(yTestPredicted, axis=1)
 
 # Calculate and display the error metrics
-cMatrix = confusion_matrix(yTest, yTestPredicted)
-pScore = precision_score(yTest, yTestPredicted, average='micro')
-rScore = recall_score(yTest, yTestPredicted, average='micro')
-f1Score = f1_score(yTest, yTestPredicted, average='micro')
+cMatrix = confusion_matrix(Y_Test, yTestPredicted)
+pScore = precision_score(Y_Test, yTestPredicted, average='micro')
+rScore = recall_score(Y_Test, yTestPredicted, average='micro')
+f1Score = f1_score(Y_Test, yTestPredicted, average='micro')
 
-print("Confusion matrix: for 18 nodes\n", cMatrix)
+print("Confusion matrix: for 24 nodes\n", cMatrix)
 print("\nP-Score: %.3f, R-Score: %.3f, F1-Score: %.3f" % (pScore, rScore, f1Score))
 
-#Normailzied to Predicted Feature
-Feature_nor = Feature_PKT / 255.0
-predicted = model.predict(Feature_nor)
+#Save Model Seguential
+model.save('HKT_GEE_2018.h5')
+New_Model = keras.models.load_model('HKT_GEE_2018.h5')
+
+predicted = New_Model.predict(Feature_PKT)
 predicted = np.argmax(predicted, axis=1)
 
 # Predict new data and export the probability raster
-prediction = np.reshape(predicted, (ds3.RasterYSize, ds3.RasterXSize))
-outFile = 'Feature_PKT_Predict_09_02_2018.tif'
-raster.export(prediction, ds3, filename=outFile, dtype='float')
+prediction = np.reshape(predicted, (ds1.RasterYSize, ds1.RasterXSize))
+outFile = 'Feature_PKT_Predict_GEE_2018.tif'
+raster.export(prediction, ds1, filename=outFile, dtype='float')
