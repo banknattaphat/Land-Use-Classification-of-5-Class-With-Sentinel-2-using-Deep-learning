@@ -36,10 +36,6 @@ nBands = Feature_PKT.shape[1]
 print("Phuket Multispectral New image shape: ", Feature_PKT.shape)
 print("Phuket Laduse New image shape: ", Label_PKT.shape)
 
-print("Bangalore Multispectral image shape: ", Feature_PKT.shape)
-print("Bangalore Binary built-up image shape: ", Label_PKT.shape)
-print("Hyderabad Multispectral image shape: ", Feature_Pre.shape)
-
 # Split testing and training datasets
 X_Train, X_Test, Y_Train, Y_Test = train_test_split(Feature_PKT, Label_PKT, test_size=0.4, random_state=42)
 
