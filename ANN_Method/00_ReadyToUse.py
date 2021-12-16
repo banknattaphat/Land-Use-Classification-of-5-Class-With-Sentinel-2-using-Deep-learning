@@ -76,7 +76,7 @@ pScore = precision_score(Y_Test, yTestPredicted, average='micro')
 rScore = recall_score(Y_Test, yTestPredicted, average='micro')
 f1Score = f1_score(Y_Test, yTestPredicted, average='micro')
 
-print("Confusion matrix: for 24 nodes\n", cMatrix)
+print("Confusion matrix: for 24 last neural\n", cMatrix)
 print("\nP-Score: %.3f, R-Score: %.3f, F1-Score: %.3f" % (pScore, rScore, f1Score))
 
 #Save Model
@@ -91,4 +91,4 @@ prediction = np.reshape(predicted, (dsps.RasterYSize, dsps.RasterXSize))
 
 #Set the outfile name
 outFile = 'Feature_PKT_Predict_15_03_20201_ANN.tif'
-raster.export(prediction, dsIMG, filename=outFile, dtype='float')
+raster.export(prediction, dsps, filename=outFile, dtype='float')
